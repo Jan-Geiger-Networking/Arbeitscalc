@@ -18,6 +18,7 @@ Import in das Auswertungs-Tool
 Starte das Tool (z.B. als .exe oder über die Konsole).
 
 Importiere die exportierte CSV-Datei über die Schaltfläche „Importieren“ oder ziehe die Datei einfach in das Programmfenster.
+
 <img src="img/Screenshot 2025-05-30 220626.png" alt="CSV Export" width="300"/>
 
 Das Tool wertet nun automatisch Arbeitszeit (von Arbeitsbeginn bis Abfahrt) und Fahrzeit (Anfahrt bis Arbeitsbeginn + Abfahrt bis Arbeitsende) pro Woche und Monat aus. Die Berechnung erfolgt immer im 1.00 Stundenformat (z.B. 30min = 0.5, 1h = 1.0).

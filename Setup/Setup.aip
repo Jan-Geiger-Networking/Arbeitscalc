@@ -19,10 +19,10 @@
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="Manufacturer" Value="Jan Geiger Networking"/>
-    <ROW Property="ProductCode" Value="1033:{46A2A933-558F-4AC0-BED3-F3B2176669F3} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{2D305AE7-66BD-4839-99F8-D13D8B1E5EE5} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Arbeitscalc"/>
-    <ROW Property="ProductVersion" Value="0.2.2.0" Options="32"/>
+    <ROW Property="ProductVersion" Value="0.2.2.1" Options="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{FAC5BDBB-71E7-4EE8-99CB-9717B4C4DCEF}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>

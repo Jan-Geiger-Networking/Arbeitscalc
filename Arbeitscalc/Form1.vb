@@ -84,8 +84,33 @@ Public Class Form1
     End Sub
 
     Private Sub dgvTagesdaten_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles dgvTagesdaten.CellValueChanged
-        AktualisiereSummen()
+        ' Prüfe, ob die bearbeitete Spalte die Pausenzeit ist
+        If dgvTagesdaten.Columns(e.ColumnIndex).HeaderText = "Pausenzeit (h)" Then
+            Dim row = dgvTagesdaten.Rows(e.RowIndex)
+            ' Lese die aktuelle Zeitdifferenz aus dem Arbeitszeit-Zeitraum
+            Dim bereich = row.Cells("Arbeitszeit-Zeitraum").Value?.ToString()
+            Dim pausenStr = row.Cells("Pausenzeit (h)").Value?.ToString()
+            Dim neueArbeitszeit As Double = 0
+
+            ' Arbeitszeitbereich muss das Format "HH:mm–HH:mm" haben!
+            If Not String.IsNullOrWhiteSpace(bereich) AndAlso bereich.Contains("–") Then
+                Dim teile = bereich.Split("–"c)
+                Dim t1, t2 As DateTime
+                If DateTime.TryParseExact(teile(0).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t1) AndAlso
+               DateTime.TryParseExact(teile(1).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t2) Then
+                    Dim pausen As Double = 0
+                    Double.TryParse(pausenStr.Replace(",", "."), Globalization.NumberStyles.Any, Globalization.CultureInfo.InvariantCulture, pausen)
+                    neueArbeitszeit = (t2 - t1).TotalMinutes / 60 - pausen
+                    If neueArbeitszeit < 0 Then neueArbeitszeit = 0
+                    row.Cells("Arbeitszeit (h)").Value = neueArbeitszeit.ToString("0.00")
+                End If
+            End If
+
+            ' Summen unten auch neu berechnen
+            AktualisiereSummen()
+        End If
     End Sub
+
 
     Private Sub AktualisiereSummen()
         Dim summenTabelle As New DataTable()
@@ -148,6 +173,7 @@ Public Class Form1
         tagesdaten.Columns.Add("Bemerkung")
         tagesdaten.Columns.Add("Fahrzeit-Zeitraum")
         tagesdaten.Columns.Add("Arbeitszeit-Zeitraum")
+        tagesdaten.Columns.Add("Pausenzeit (h)")
         tagesdaten.Columns.Add("Arbeitszeit (h)")
         tagesdaten.Columns.Add("Fahrzeit (h)")
         tagesdaten.Columns.Add("Datenintegrität")
@@ -215,9 +241,16 @@ Public Class Form1
 
                 Dim arbeitszeitBereich As String = ""
                 Dim arbeitszeit As Double = 0
+                Dim pausenzeit As Double = 0.75 ' Standard: Mo–Do
+
+                Dim tagName = datum.ToString("dddd", New CultureInfo("de-DE"))
+                If tagName.ToLower() = "freitag" Then
+                    pausenzeit = 0.25
+                End If
+
                 If arbeitsbeginn.HasValue AndAlso blockEnd.HasValue Then
                     arbeitszeitBereich = $"{arbeitsbeginn.Value:HH:mm}–{blockEnd.Value:HH:mm}"
-                    arbeitszeit = (blockEnd.Value - arbeitsbeginn.Value).TotalMinutes / 60 - 0.75
+                    arbeitszeit = (blockEnd.Value - arbeitsbeginn.Value).TotalMinutes / 60 - pausenzeit
                     If arbeitszeit < 0 Then arbeitszeit = 0
                 End If
 
@@ -256,9 +289,19 @@ Public Class Form1
                     status = "FEHLERHAFT"
                 End If
 
-                Dim tagName = datum.ToString("dddd", New CultureInfo("de-DE"))
                 Dim datumStr = datum.ToString("dd.MM.yyyy")
-                tagesdaten.Rows.Add(tagName, datumStr, baustelle, bemerkungenText, fahrzeitBereich, arbeitszeitBereich, arbeitszeit.ToString("0.00"), fahrzeitGesamt.ToString("0.00"), status)
+                tagesdaten.Rows.Add(
+                tagName,
+                datumStr,
+                baustelle,
+                bemerkungenText,
+                fahrzeitBereich,
+                arbeitszeitBereich,
+                pausenzeit.ToString("0.00"),
+                arbeitszeit.ToString("0.00"),
+                fahrzeitGesamt.ToString("0.00"),
+                status
+            )
 
                 i = blockEndIndex + 1
             Else
@@ -269,6 +312,7 @@ Public Class Form1
         dgvTagesdaten.DataSource = tagesdaten
         dgvTagesdaten.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         dgvTagesdaten.ReadOnly = False
+        dgvTagesdaten.Columns("Pausenzeit (h)").ReadOnly = False ' Nur die Pausenzeit ist editierbar
 
         AktualisiereSummen()
     End Sub
@@ -355,6 +399,7 @@ Public Class Form1
             MessageBox.Show("PDF exportiert: " & sfd.FileName)
         End If
     End Sub
+
     Private Sub ExportiereCSV()
         Dim monat = DateTime.Now.ToString("MMMM", New CultureInfo("de-DE"))
         Dim jahr = DateTime.Now.Year.ToString()
@@ -399,6 +444,7 @@ Public Class Form1
             MessageBox.Show("CSV exportiert: " & sfd.FileName)
         End If
     End Sub
+
 
     Private Sub PDSOnlineToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles PDSOnlineToolStripMenuItem1.Click
         Process.Start(New ProcessStartInfo("https://11427-01.pdscloud.de/pds/portal/") With {.UseShellExecute = True})

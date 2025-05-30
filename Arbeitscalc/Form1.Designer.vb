@@ -1,0 +1,160 @@
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+Partial Class Form1
+    Inherits System.Windows.Forms.Form
+
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()>
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
+
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()>
+    Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
+        openFileDialog1 = New OpenFileDialog()
+        dgvTagesdaten = New DataGridView()
+        dgvSummen = New DataGridView()
+        LabelTagesdaten = New Label()
+        LabelSummen = New Label()
+        MenuStrip1 = New MenuStrip()
+        ToolStripMenuItem1 = New ToolStripMenuItem()
+        ÖffnenToolStripMenuItem = New ToolStripMenuItem()
+        ExportierenToolStripMenuItem = New ToolStripMenuItem()
+        InfoToolStripMenuItem = New ToolStripMenuItem()
+        RechtlichesToolStripMenuItem = New ToolStripMenuItem()
+        CType(dgvTagesdaten, ComponentModel.ISupportInitialize).BeginInit()
+        CType(dgvSummen, ComponentModel.ISupportInitialize).BeginInit()
+        MenuStrip1.SuspendLayout()
+        SuspendLayout()
+        ' 
+        ' openFileDialog1
+        ' 
+        openFileDialog1.FileName = "OpenFileDialog1"
+        ' 
+        ' dgvTagesdaten
+        ' 
+        dgvTagesdaten.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        dgvTagesdaten.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        dgvTagesdaten.Location = New Point(12, 42)
+        dgvTagesdaten.Name = "dgvTagesdaten"
+        dgvTagesdaten.Size = New Size(1077, 422)
+        dgvTagesdaten.TabIndex = 1
+        ' 
+        ' dgvSummen
+        ' 
+        dgvSummen.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        dgvSummen.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        dgvSummen.Location = New Point(12, 499)
+        dgvSummen.Name = "dgvSummen"
+        dgvSummen.Size = New Size(1077, 283)
+        dgvSummen.TabIndex = 2
+        ' 
+        ' LabelTagesdaten
+        ' 
+        LabelTagesdaten.AutoSize = True
+        LabelTagesdaten.Location = New Point(12, 24)
+        LabelTagesdaten.Name = "LabelTagesdaten"
+        LabelTagesdaten.Size = New Size(67, 15)
+        LabelTagesdaten.TabIndex = 3
+        LabelTagesdaten.Text = "Tagesdaten"
+        ' 
+        ' LabelSummen
+        ' 
+        LabelSummen.AutoSize = True
+        LabelSummen.Location = New Point(12, 481)
+        LabelSummen.Name = "LabelSummen"
+        LabelSummen.Size = New Size(55, 15)
+        LabelSummen.TabIndex = 4
+        LabelSummen.Text = "Summen"
+        ' 
+        ' MenuStrip1
+        ' 
+        MenuStrip1.Items.AddRange(New ToolStripItem() {ToolStripMenuItem1, InfoToolStripMenuItem, RechtlichesToolStripMenuItem})
+        MenuStrip1.Location = New Point(0, 0)
+        MenuStrip1.Name = "MenuStrip1"
+        MenuStrip1.Size = New Size(1101, 24)
+        MenuStrip1.TabIndex = 6
+        MenuStrip1.Text = "MenuStrip1"
+        ' 
+        ' ToolStripMenuItem1
+        ' 
+        ToolStripMenuItem1.DropDownItems.AddRange(New ToolStripItem() {ÖffnenToolStripMenuItem, ExportierenToolStripMenuItem})
+        ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        ToolStripMenuItem1.Size = New Size(46, 20)
+        ToolStripMenuItem1.Text = "Datei"
+        ' 
+        ' ÖffnenToolStripMenuItem
+        ' 
+        ÖffnenToolStripMenuItem.Name = "ÖffnenToolStripMenuItem"
+        ÖffnenToolStripMenuItem.Size = New Size(133, 22)
+        ÖffnenToolStripMenuItem.Text = "Öffnen"
+        ' 
+        ' ExportierenToolStripMenuItem
+        ' 
+        ExportierenToolStripMenuItem.Name = "ExportierenToolStripMenuItem"
+        ExportierenToolStripMenuItem.Size = New Size(133, 22)
+        ExportierenToolStripMenuItem.Text = "Exportieren"
+        ' 
+        ' InfoToolStripMenuItem
+        ' 
+        InfoToolStripMenuItem.Name = "InfoToolStripMenuItem"
+        InfoToolStripMenuItem.Size = New Size(40, 20)
+        InfoToolStripMenuItem.Text = "Info"
+        ' 
+        ' RechtlichesToolStripMenuItem
+        ' 
+        RechtlichesToolStripMenuItem.Name = "RechtlichesToolStripMenuItem"
+        RechtlichesToolStripMenuItem.Size = New Size(79, 20)
+        RechtlichesToolStripMenuItem.Text = "Rechtliches"
+        ' 
+        ' Form1
+        ' 
+        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
+        AutoScaleMode = AutoScaleMode.Font
+        AutoSize = True
+        ClientSize = New Size(1101, 794)
+        Controls.Add(LabelSummen)
+        Controls.Add(LabelTagesdaten)
+        Controls.Add(dgvSummen)
+        Controls.Add(dgvTagesdaten)
+        Controls.Add(MenuStrip1)
+        FormBorderStyle = FormBorderStyle.FixedSingle
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        MainMenuStrip = MenuStrip1
+        MinimumSize = New Size(1117, 833)
+        Name = "Form1"
+        SizeGripStyle = SizeGripStyle.Show
+        Text = "Arbeitscalc by Jan Geiger Networking"
+        CType(dgvTagesdaten, ComponentModel.ISupportInitialize).EndInit()
+        CType(dgvSummen, ComponentModel.ISupportInitialize).EndInit()
+        MenuStrip1.ResumeLayout(False)
+        MenuStrip1.PerformLayout()
+        ResumeLayout(False)
+        PerformLayout()
+    End Sub
+
+    Friend WithEvents openFileDialog1 As OpenFileDialog
+    Friend WithEvents dgvTagesdaten As DataGridView
+    Friend WithEvents dgvSummen As DataGridView
+    Friend WithEvents LabelTagesdaten As Label
+    Friend WithEvents LabelSummen As Label
+    Friend WithEvents MenuStrip1 As MenuStrip
+    Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents ÖffnenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ExportierenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents InfoToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RechtlichesToolStripMenuItem As ToolStripMenuItem
+
+End Class

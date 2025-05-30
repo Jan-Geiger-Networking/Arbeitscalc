@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Arbeitscalc", "Arbeitscalc\Arbeitscalc.vbproj", "{920144F8-F87F-4567-BDE0-3D0CF698407B}"
+EndProject
+Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "Setup", "Setup\Setup.aiproj", "{F2A8B02D-E728-44B0-BD4F-DD02670B6CD6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DefaultBuild|Any CPU = DefaultBuild|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{920144F8-F87F-4567-BDE0-3D0CF698407B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{920144F8-F87F-4567-BDE0-3D0CF698407B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{920144F8-F87F-4567-BDE0-3D0CF698407B}.DefaultBuild|Any CPU.ActiveCfg = Release|Any CPU
+		{920144F8-F87F-4567-BDE0-3D0CF698407B}.DefaultBuild|Any CPU.Build.0 = Release|Any CPU
+		{920144F8-F87F-4567-BDE0-3D0CF698407B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{920144F8-F87F-4567-BDE0-3D0CF698407B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2A8B02D-E728-44B0-BD4F-DD02670B6CD6}.Debug|Any CPU.ActiveCfg = DefaultBuild
+		{F2A8B02D-E728-44B0-BD4F-DD02670B6CD6}.Debug|Any CPU.Build.0 = DefaultBuild
+		{F2A8B02D-E728-44B0-BD4F-DD02670B6CD6}.DefaultBuild|Any CPU.ActiveCfg = DefaultBuild
+		{F2A8B02D-E728-44B0-BD4F-DD02670B6CD6}.DefaultBuild|Any CPU.Build.0 = DefaultBuild
+		{F2A8B02D-E728-44B0-BD4F-DD02670B6CD6}.Release|Any CPU.ActiveCfg = DefaultBuild
+		{F2A8B02D-E728-44B0-BD4F-DD02670B6CD6}.Release|Any CPU.Build.0 = DefaultBuild
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4731219B-82B2-4469-9DD1-5647EE9F9783}
+	EndGlobalSection
+EndGlobal

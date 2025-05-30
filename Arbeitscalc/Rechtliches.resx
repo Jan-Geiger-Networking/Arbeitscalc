@@ -121,7 +121,7 @@
   <data name="LogoPictureBox.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAABKgAAAt2CAYAAADuof+TAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vwAADr8BOAVTJAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIDUuMS43i9b3OQAA/45JREFUeF7s3Qe4
+        vgAADr4B6kKxwAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIDUuMS43i9b3OQAA/45JREFUeF7s3Qe4
         JFWd//9DRlEBEyqiqJiQMPfUHcA4rAqO3D7nzriMitlV8adr3DWHnV3DGjDiKmtEMY8wXXVnRBEVwxoW
         XXMOiwkVFEwIIvCp39M9uur3DDChu7rq1Pv1PO/nv3+FmTqnw/7Od7urnQMAAAAAAAAAAAAAAAAAAAAA
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -4293,21 +4293,24 @@
 </value>
   </data>
   <data name="TextBox1.Text" xml:space="preserve">
-    <value>Dieses Programm verwendet folgende externe Bibliotheken:
+    <value>Arbeitscalc – Lizenzinformationen
 
-iTextSharp (Version 5.5.13.3) – PDF-Erzeugung
-Lizenz: AGPL (https://itextpdf.com/en/resources/licenses)
+Copyright (c) 2025 Jan Geiger
 
-Die verwendeten Pakete bleiben Eigentum der jeweiligen Entwickler.
-Dieses Programm selbst ist derzeit nicht quelloffen und darf ohne Zustimmung nicht weiterverbreitet werden.</value>
+Dieses Projekt verwendet den folgenden Lizenzmix:
+
+1. Eigenentwickelter Code:
+   Lizenz: MIT License
+   Siehe Datei: LICENSE-MIT.txt
+
+2. Eingesetzte Bibliothek:
+   - iTextSharp (Version 5.5.13.3) – PDF-Erzeugung
+     Lizenz: GNU Affero General Public License (AGPL) v3
+     Lizenztext: https://www.gnu.org/licenses/agpl-3.0.de.html
+
+Hinweis: Durch die Verwendung von iTextSharp unterliegt das gesamte Projekt den Bedingungen der AGPLv3. Bei Verbreitung oder öffentlicher Zugänglichmachung des Programms sind Sie verpflichtet, den vollständigen Quellcode offen zu legen.</value>
   </data>
   <data name="TextBox2.Text" xml:space="preserve">
-    <value>Dieses Programm dient der unterstützenden Berechnung und Auswertung von Arbeits- und Fahrzeiten anhand strukturierter Textdateien.
-Trotz sorgfältiger Programmierung kann nicht ausgeschlossen werden, dass das Programm Fehler enthält oder unter bestimmten Bedingungen nicht korrekt funktioniert.
-
-Die Verantwortung für die Richtigkeit der berechneten Daten liegt beim Nutzer.
-Bitte prüfen Sie alle Ergebnisse vor der Weitergabe oder Abrechnung sorgfältig.
-
-Der Entwickler übernimmt keine Haftung für etwaige Schäden, die durch die Nutzung oder fehlerhafte Auswertung entstehen.</value>
+    <value>Dieses Programm dient der unterstützenden Berechnung und Auswertung von Arbeits- und Fahrzeiten anhand strukturierter Textdateien. Trotz sorgfältiger Programmierung kann nicht ausgeschlossen werden, dass das Programm Fehler enthält oder unter bestimmten Bedingungen nicht korrekt funktioniert. Die Verantwortung für die Richtigkeit der berechneten Daten liegt beim Nutzer. Bitte prüfen Sie alle Ergebnisse vor der Weitergabe oder Abrechnung sorgfältig. Der Entwickler übernimmt keine Haftung für Schäden, die durch die Nutzung oder fehlerhafte Auswertung entstehen, es sei denn, diese beruhen auf vorsätzlichem oder grob fahrlässigem Verhalten des Entwicklers.</value>
   </data>
 </root>

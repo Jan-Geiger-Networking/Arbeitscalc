@@ -39,6 +39,7 @@ Partial Class Form1
         ToolsToolStripMenuItem = New ToolStripMenuItem()
         PDSOnlineToolStripMenuItem1 = New ToolStripMenuItem()
         GithubToolStripMenuItem = New ToolStripMenuItem()
+        JGNSchlaubereichToolStripMenuItem = New ToolStripMenuItem()
         InfoToolStripMenuItem = New ToolStripMenuItem()
         RechtlichesToolStripMenuItem = New ToolStripMenuItem()
         SplitContainer1 = New SplitContainer()
@@ -57,6 +58,7 @@ Partial Class Form1
         ' 
         ' dgvTagesdaten
         ' 
+        dgvTagesdaten.AllowDrop = True
         dgvTagesdaten.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         dgvTagesdaten.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
         dgvTagesdaten.Dock = DockStyle.Fill
@@ -67,6 +69,7 @@ Partial Class Form1
         ' 
         ' dgvSummen
         ' 
+        dgvSummen.AllowDrop = True
         dgvSummen.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         dgvSummen.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
         dgvSummen.Dock = DockStyle.Fill
@@ -113,7 +116,7 @@ Partial Class Form1
         ' 
         ImportStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {CSVImportToolStripMenuItem, ÖffnenToolStripMenuItem})
         ImportStripMenuItem.Name = "ImportStripMenuItem"
-        ImportStripMenuItem.Size = New Size(180, 22)
+        ImportStripMenuItem.Size = New Size(136, 22)
         ImportStripMenuItem.Text = "Importieren"
         ' 
         ' CSVImportToolStripMenuItem
@@ -132,7 +135,7 @@ Partial Class Form1
         ' 
         ExportierenToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDFToolStripMenuItem, CSVToolStripMenuItem})
         ExportierenToolStripMenuItem.Name = "ExportierenToolStripMenuItem"
-        ExportierenToolStripMenuItem.Size = New Size(180, 22)
+        ExportierenToolStripMenuItem.Size = New Size(136, 22)
         ExportierenToolStripMenuItem.Text = "Exportieren"
         ' 
         ' PDFToolStripMenuItem
@@ -149,7 +152,7 @@ Partial Class Form1
         ' 
         ' ToolsToolStripMenuItem
         ' 
-        ToolsToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDSOnlineToolStripMenuItem1, GithubToolStripMenuItem})
+        ToolsToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDSOnlineToolStripMenuItem1, GithubToolStripMenuItem, JGNSchlaubereichToolStripMenuItem})
         ToolsToolStripMenuItem.Name = "ToolsToolStripMenuItem"
         ToolsToolStripMenuItem.Size = New Size(47, 20)
         ToolsToolStripMenuItem.Text = "Tools"
@@ -157,14 +160,20 @@ Partial Class Form1
         ' PDSOnlineToolStripMenuItem1
         ' 
         PDSOnlineToolStripMenuItem1.Name = "PDSOnlineToolStripMenuItem1"
-        PDSOnlineToolStripMenuItem1.Size = New Size(180, 22)
+        PDSOnlineToolStripMenuItem1.Size = New Size(133, 22)
         PDSOnlineToolStripMenuItem1.Text = "PDS Online"
         ' 
         ' GithubToolStripMenuItem
         ' 
         GithubToolStripMenuItem.Name = "GithubToolStripMenuItem"
-        GithubToolStripMenuItem.Size = New Size(180, 22)
+        GithubToolStripMenuItem.Size = New Size(133, 22)
         GithubToolStripMenuItem.Text = "Github"
+        ' 
+        ' JGNSchlaubereichToolStripMenuItem
+        ' 
+        JGNSchlaubereichToolStripMenuItem.Name = "JGNSchlaubereichToolStripMenuItem"
+        JGNSchlaubereichToolStripMenuItem.Size = New Size(133, 22)
+        JGNSchlaubereichToolStripMenuItem.Text = "JGN Schlau"
         ' 
         ' InfoToolStripMenuItem
         ' 
@@ -180,6 +189,7 @@ Partial Class Form1
         ' 
         ' SplitContainer1
         ' 
+        SplitContainer1.AllowDrop = True
         SplitContainer1.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         SplitContainer1.Location = New Point(12, 27)
         SplitContainer1.Name = "SplitContainer1"
@@ -200,7 +210,8 @@ Partial Class Form1
         ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(96.0F, 96.0F)
+        AllowDrop = True
+        AutoScaleDimensions = New SizeF(96F, 96F)
         AutoScaleMode = AutoScaleMode.Dpi
         AutoSizeMode = AutoSizeMode.GrowAndShrink
         ClientSize = New Size(1101, 794)
@@ -244,5 +255,6 @@ Partial Class Form1
     Friend WithEvents ToolsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents PDSOnlineToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents GithubToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents JGNSchlaubereichToolStripMenuItem As ToolStripMenuItem
 
 End Class

@@ -59,8 +59,6 @@ Public Class Form1
         StarteFileWatcher(geladeneDatei)
     End Sub
 
-    ' =====================================================================
-
     Private Sub StarteFileWatcher(pfad As String)
         If watcher IsNot Nothing Then
             watcher.EnableRaisingEvents = False
@@ -84,20 +82,17 @@ Public Class Form1
     End Sub
 
     Private Sub dgvTagesdaten_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles dgvTagesdaten.CellValueChanged
-        ' Prüfe, ob die bearbeitete Spalte die Pausenzeit ist
         If dgvTagesdaten.Columns(e.ColumnIndex).HeaderText = "Pausenzeit (h)" Then
             Dim row = dgvTagesdaten.Rows(e.RowIndex)
-            ' Lese die aktuelle Zeitdifferenz aus dem Arbeitszeit-Zeitraum
             Dim bereich = row.Cells("Arbeitszeit-Zeitraum").Value?.ToString()
             Dim pausenStr = row.Cells("Pausenzeit (h)").Value?.ToString()
             Dim neueArbeitszeit As Double = 0
 
-            ' Arbeitszeitbereich muss das Format "HH:mm–HH:mm" haben!
             If Not String.IsNullOrWhiteSpace(bereich) AndAlso bereich.Contains("–") Then
                 Dim teile = bereich.Split("–"c)
                 Dim t1, t2 As DateTime
                 If DateTime.TryParseExact(teile(0).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t1) AndAlso
-               DateTime.TryParseExact(teile(1).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t2) Then
+                   DateTime.TryParseExact(teile(1).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t2) Then
                     Dim pausen As Double = 0
                     Double.TryParse(pausenStr.Replace(",", "."), Globalization.NumberStyles.Any, Globalization.CultureInfo.InvariantCulture, pausen)
                     neueArbeitszeit = (t2 - t1).TotalMinutes / 60 - pausen
@@ -106,11 +101,46 @@ Public Class Form1
                 End If
             End If
 
-            ' Summen unten auch neu berechnen
+            ' Überstunden und Vergütung ebenfalls neu berechnen
+            AktualisiereTageszeile(row)
             AktualisiereSummen()
         End If
     End Sub
 
+    Private Sub AktualisiereTageszeile(row As DataGridViewRow)
+        Try
+            Dim tagName = row.Cells("Tag").Value?.ToString()
+            Dim vergZeitStr = row.Cells("Vergütete Arbeitszeit (h)").Value?.ToString()
+            Dim pausenzeitStr = row.Cells("Pausenzeit (h)").Value?.ToString()
+            Dim arbeitszeitStr = row.Cells("Arbeitszeit (h)").Value?.ToString() ' <-- Diese Zeile ergänzt!
+
+            Dim arbeitszeit As Double = 0
+            Dim pausenzeit As Double = 0
+            Double.TryParse(arbeitszeitStr.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, arbeitszeit)
+            Double.TryParse(pausenzeitStr.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, pausenzeit)
+            Dim soll As Double = If(tagName.ToLower() = "freitag", 6, 8)
+            Dim uebersoll As Double = 0
+            Dim ueb25 As Double = 0
+            Dim ueb50 As Double = 0
+            If arbeitszeit > soll Then
+                uebersoll = arbeitszeit - soll
+                ueb25 = Math.Min(2, uebersoll)
+                ueb50 = Math.Max(0, uebersoll - 2)
+            Else
+                uebersoll = 0
+                ueb25 = 0
+                ueb50 = 0
+            End If
+            Dim vergütet As Double = soll + ueb25 * 1.25 + ueb50 * 1.5
+
+            row.Cells("Überstunden (h)").Value = uebersoll.ToString("0.00")
+            row.Cells("Überstd. 25% (h)").Value = ueb25.ToString("0.00")
+            row.Cells("Überstd. 50% (h)").Value = ueb50.ToString("0.00")
+            row.Cells("Vergütete Arbeitszeit (h)").Value = vergütet.ToString("0.00")
+        Catch ex As Exception
+            ' Fehlerbehandlung
+        End Try
+    End Sub
 
     Private Sub AktualisiereSummen()
         Dim summenTabelle As New DataTable()
@@ -126,7 +156,8 @@ Public Class Form1
         For Each row As DataGridViewRow In dgvTagesdaten.Rows
             If Not row.IsNewRow Then
                 Dim datumStr = row.Cells("Datum").Value?.ToString()
-                Dim arbeitszeitStr = row.Cells("Arbeitszeit (h)").Value?.ToString()
+                ' Neu: Vergütete Arbeitszeit (h) summieren!
+                Dim vergZeitStr = row.Cells("Vergütete Arbeitszeit (h)").Value?.ToString()
                 Dim fahrzeitStr = row.Cells("Fahrzeit (h)").Value?.ToString()
 
                 If DateTime.TryParseExact(datumStr, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
@@ -135,7 +166,7 @@ Public Class Form1
                     Dim monat = datum.ToString("MMMM yyyy", New CultureInfo("de-DE"))
                     Dim kw = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(datum, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday)
 
-                    Dim aVal = If(IsNumeric(arbeitszeitStr), Convert.ToDouble(arbeitszeitStr), 0.0)
+                    Dim aVal = If(IsNumeric(vergZeitStr), Convert.ToDouble(vergZeitStr), 0.0)
                     Dim fVal = If(IsNumeric(fahrzeitStr), Convert.ToDouble(fahrzeitStr), 0.0)
 
                     If Not summenProWoche.ContainsKey(kw) Then summenProWoche(kw) = Tuple.Create(0.0, 0.0)
@@ -176,6 +207,10 @@ Public Class Form1
         tagesdaten.Columns.Add("Pausenzeit (h)")
         tagesdaten.Columns.Add("Arbeitszeit (h)")
         tagesdaten.Columns.Add("Fahrzeit (h)")
+        tagesdaten.Columns.Add("Überstunden (h)")
+        tagesdaten.Columns.Add("Überstd. 25% (h)")
+        tagesdaten.Columns.Add("Überstd. 50% (h)")
+        tagesdaten.Columns.Add("Vergütete Arbeitszeit (h)")
         tagesdaten.Columns.Add("Datenintegrität")
 
         Dim i As Integer = 0
@@ -254,6 +289,22 @@ Public Class Form1
                     If arbeitszeit < 0 Then arbeitszeit = 0
                 End If
 
+                Dim soll As Double = If(tagName.ToLower() = "freitag", 6, 8)
+                Dim uebersoll As Double = 0
+                Dim ueb25 As Double = 0
+                Dim ueb50 As Double = 0
+                If arbeitszeit > soll Then
+                    uebersoll = arbeitszeit - soll
+                    ueb25 = Math.Min(2, uebersoll)
+                    ueb50 = Math.Max(0, uebersoll - 2)
+                Else
+                    uebersoll = 0
+                    ueb25 = 0
+                    ueb50 = 0
+                End If
+
+                Dim vergütet As Double = soll + ueb25 * 1.25 + ueb50 * 1.5
+
                 Dim fahrzeitBereich As String = ""
                 Dim fahrzeitGesamt As Double = 0
                 If startFahrzeit.HasValue AndAlso arbeitsbeginn.HasValue Then
@@ -291,17 +342,21 @@ Public Class Form1
 
                 Dim datumStr = datum.ToString("dd.MM.yyyy")
                 tagesdaten.Rows.Add(
-                tagName,
-                datumStr,
-                baustelle,
-                bemerkungenText,
-                fahrzeitBereich,
-                arbeitszeitBereich,
-                pausenzeit.ToString("0.00"),
-                arbeitszeit.ToString("0.00"),
-                fahrzeitGesamt.ToString("0.00"),
-                status
-            )
+                    tagName,
+                    datumStr,
+                    baustelle,
+                    bemerkungenText,
+                    fahrzeitBereich,
+                    arbeitszeitBereich,
+                    pausenzeit.ToString("0.00"),
+                    arbeitszeit.ToString("0.00"),
+                    fahrzeitGesamt.ToString("0.00"),
+                    uebersoll.ToString("0.00"),
+                    ueb25.ToString("0.00"),
+                    ueb50.ToString("0.00"),
+                    vergütet.ToString("0.00"),
+                    status
+                )
 
                 i = blockEndIndex + 1
             Else
@@ -312,12 +367,12 @@ Public Class Form1
         dgvTagesdaten.DataSource = tagesdaten
         dgvTagesdaten.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         dgvTagesdaten.ReadOnly = False
-        dgvTagesdaten.Columns("Pausenzeit (h)").ReadOnly = False ' Nur die Pausenzeit ist editierbar
+        dgvTagesdaten.Columns("Pausenzeit (h)").ReadOnly = False
 
         AktualisiereSummen()
     End Sub
 
-    ' ============================================================================
+    ' ===== Menü- und Export/Import =======================================
 
     Private Sub InfoToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles InfoToolStripMenuItem.Click
         Dim about As New About()
@@ -343,6 +398,7 @@ Public Class Form1
     Private Sub CSVToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CSVToolStripMenuItem.Click
         ExportiereCSV()
     End Sub
+
     Private Sub ExportierePDF()
         Dim monat = DateTime.Now.ToString("MMMM", New CultureInfo("de-DE"))
         Dim jahr = DateTime.Now.Year.ToString()
@@ -445,7 +501,6 @@ Public Class Form1
         End If
     End Sub
 
-
     Private Sub PDSOnlineToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles PDSOnlineToolStripMenuItem1.Click
         Process.Start(New ProcessStartInfo("https://11427-01.pdscloud.de/pds/portal/") With {.UseShellExecute = True})
     End Sub
@@ -496,6 +551,76 @@ Public Class Form1
     )
         If result = DialogResult.Yes Then
             Process.Start(New ProcessStartInfo(releaseUrl) With {.UseShellExecute = True})
+        End If
+    End Sub
+
+    Private Sub JGNSchlaubereichToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles JGNSchlaubereichToolStripMenuItem.Click
+        Process.Start(New ProcessStartInfo("https://jgnet.eu/schlau") With {.UseShellExecute = True})
+    End Sub
+
+    Private Sub Form1_DragEnter(sender As Object, e As DragEventArgs) Handles Me.DragEnter
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            e.Effect = DragDropEffects.Copy
+        End If
+    End Sub
+
+    Private Sub Form1_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
+        Dim files() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
+        If files.Length > 0 Then
+            Dim filePath = files(0)
+            If filePath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) Then
+                ImportiereCSV(filePath)
+            ElseIf filePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) Then
+                ' TXT-Import analog wie im Menü
+                Dim lines = System.IO.File.ReadAllLines(filePath)
+                ' (Hier ggf. eigenen TXT-Import aufrufen, falls du willst)
+            Else
+                MessageBox.Show("Nur CSV oder TXT Dateien können importiert werden!")
+            End If
+        End If
+    End Sub
+
+    Private Sub dgvTagesdaten_DragEnter(sender As Object, e As DragEventArgs) Handles dgvTagesdaten.DragEnter
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            e.Effect = DragDropEffects.Copy
+        End If
+    End Sub
+
+    Private Sub dgvTagesdaten_DragDrop(sender As Object, e As DragEventArgs) Handles dgvTagesdaten.DragDrop
+        Dim files() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
+        If files.Length > 0 Then
+            Dim filePath = files(0)
+            If filePath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) Then
+                ImportiereCSV(filePath)
+            ElseIf filePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) Then
+                ' TXT-Import analog wie im Menü
+                Dim lines = System.IO.File.ReadAllLines(filePath)
+                ' (Hier ggf. eigenen TXT-Import aufrufen)
+            Else
+                MessageBox.Show("Nur CSV oder TXT Dateien können importiert werden!")
+            End If
+        End If
+    End Sub
+
+    Private Sub dgvSummen_DragEnter(sender As Object, e As DragEventArgs) Handles dgvTagesdaten.DragEnter
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            e.Effect = DragDropEffects.Copy
+        End If
+    End Sub
+
+    Private Sub dgvSummen_DragDrop(sender As Object, e As DragEventArgs) Handles dgvTagesdaten.DragDrop
+        Dim files() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
+        If files.Length > 0 Then
+            Dim filePath = files(0)
+            If filePath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) Then
+                ImportiereCSV(filePath)
+            ElseIf filePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) Then
+                ' TXT-Import analog wie im Menü
+                Dim lines = System.IO.File.ReadAllLines(filePath)
+                ' (Hier ggf. eigenen TXT-Import aufrufen)
+            Else
+                MessageBox.Show("Nur CSV oder TXT Dateien können importiert werden!")
+            End If
         End If
     End Sub
 End Class

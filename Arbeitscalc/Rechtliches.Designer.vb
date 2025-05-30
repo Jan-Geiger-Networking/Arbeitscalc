@@ -97,6 +97,7 @@ Partial Class Rechtliches
         TextBox1.Multiline = True
         TextBox1.Name = "TextBox1"
         TextBox1.ReadOnly = True
+        TextBox1.ScrollBars = ScrollBars.Both
         TextBox1.Size = New Size(291, 258)
         TextBox1.TabIndex = 0
         TextBox1.Text = resources.GetString("TextBox1.Text")
@@ -124,7 +125,7 @@ Partial Class Rechtliches
         TextBox2.TabIndex = 0
         TextBox2.Text = resources.GetString("TextBox2.Text")
         ' 
-        ' AboutBox1
+        ' Rechtliches
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
@@ -134,7 +135,7 @@ Partial Class Rechtliches
         Margin = New Padding(4, 3, 4, 3)
         MaximizeBox = False
         MinimizeBox = False
-        Name = "AboutBox1"
+        Name = "Rechtliches"
         Padding = New Padding(10)
         ShowInTaskbar = False
         StartPosition = FormStartPosition.CenterParent

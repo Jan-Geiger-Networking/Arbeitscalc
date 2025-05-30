@@ -5,7 +5,7 @@
     <TargetFramework>net9.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
-    <Version>0.2.2.1</Version>
+    <Version>0.2.3.0</Version>
     <Authors>Jan Geiger</Authors>
     <Company>Jan Geiger Networking</Company>
     <Copyright>© 2025 Jan Geiger</Copyright>

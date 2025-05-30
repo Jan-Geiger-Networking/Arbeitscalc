@@ -223,74 +223,110 @@ Public Class Form1
 
             Dim i As Integer = 0
             While i < sortedEntries.Count
-                If sortedEntries(i).Item2 = "Anfahrt" Then
-                    Dim anfahrt = sortedEntries(i)
-                    Dim baustelle = anfahrt.Item3
-                    Dim datum = anfahrt.Item1.Date
+                If sortedEntries(i).Item2 = "Anfahrt" Or sortedEntries(i).Item2 = "Arbeitsbeginn" Then
+                    Dim baustelle = sortedEntries(i).Item3
+                    Dim datum = sortedEntries(i).Item1.Date
+                    Dim startFahrzeit As DateTime? = Nothing
+                    Dim arbeitsbeginn As DateTime? = Nothing
 
-                    ' Suche Arbeitsbeginn
-                    Dim arbeitsbeginn As Tuple(Of DateTime, String, String) = Nothing
-                    If i + 1 < sortedEntries.Count AndAlso sortedEntries(i + 1).Item2 = "Arbeitsbeginn" AndAlso sortedEntries(i + 1).Item3 = baustelle Then
-                        arbeitsbeginn = sortedEntries(i + 1)
-                        ' Block starten
-                        Dim blockStart = arbeitsbeginn.Item1
-                        Dim blockEnd As DateTime? = Nothing
-                        Dim status As String = "OK"
-                        Dim j = i + 2
-                        Dim foundAbfahrt = False
-
-                        While j < sortedEntries.Count
-                            ' 1. Abfahrt auf dieser Baustelle
-                            If sortedEntries(j).Item2 = "Abfahrt" AndAlso sortedEntries(j).Item3 = baustelle Then
-                                blockEnd = sortedEntries(j).Item1
-                                foundAbfahrt = True
-                                Exit While
-                            End If
-                            ' 2. Anfahrt/Arbeitsbeginn auf ANDERER Baustelle = Blockende
-                            If (sortedEntries(j).Item2 = "Anfahrt" Or sortedEntries(j).Item2 = "Arbeitsbeginn") AndAlso sortedEntries(j).Item3 <> baustelle Then
-                                blockEnd = sortedEntries(j).Item1
-                                status = "FEHLERHAFT"
-                                Exit While
-                            End If
-                            ' 3. Arbeitsende auf dieser Baustelle als Notnagel (Tagesende)
-                            If sortedEntries(j).Item2 = "Arbeitsende" AndAlso sortedEntries(j).Item3 = baustelle Then
-                                blockEnd = sortedEntries(j).Item1
-                                status = "FEHLERHAFT"
-                                Exit While
-                            End If
-                            j += 1
-                        End While
-
-                        If blockEnd.HasValue Then
-                            ' Zeiten berechnen
-                            Dim fahrzeit = (arbeitsbeginn.Item1 - anfahrt.Item1).TotalMinutes / 60 ' Anfahrt
-                            If foundAbfahrt AndAlso j + 1 < sortedEntries.Count AndAlso sortedEntries(j + 1).Item2 = "Arbeitsende" AndAlso sortedEntries(j + 1).Item3 = baustelle Then
-                                fahrzeit += (sortedEntries(j + 1).Item1 - blockEnd.Value).TotalMinutes / 60 ' Rückfahrt
-                            End If
-                            Dim arbeitszeit = (blockEnd.Value - arbeitsbeginn.Item1).TotalMinutes / 60 - 0.75
-                            If arbeitszeit < 0 Then arbeitszeit = 0
-                            Dim tagName = datum.ToString("dddd", New CultureInfo("de-DE"))
-                            Dim datumStr = datum.ToString("dd.MM.yyyy")
-                            Dim fahrzeitBereich = $"{anfahrt.Item1:HH\:mm}–{arbeitsbeginn.Item1:HH\:mm}"
-                            If foundAbfahrt AndAlso j + 1 < sortedEntries.Count AndAlso sortedEntries(j + 1).Item2 = "Arbeitsende" AndAlso sortedEntries(j + 1).Item3 = baustelle Then
-                                fahrzeitBereich &= $", {blockEnd.Value:HH\:mm}–{sortedEntries(j + 1).Item1:HH\:mm}"
-                            End If
-                            Dim arbeitszeitBereich = $"{arbeitsbeginn.Item1:HH\:mm}–{blockEnd.Value:HH\:mm}"
-
-                            tagesdaten.Rows.Add(tagName, datumStr, baustelle, fahrzeitBereich, arbeitszeitBereich, arbeitszeit.ToString("0.00"), fahrzeit.ToString("0.00"), status)
-
-                            ' i vorspulen bis zum nächsten „Anfahrt“ (bzw. zum Ende dieses Blocks)
-                            i = j
-                            If foundAbfahrt AndAlso j + 1 < sortedEntries.Count AndAlso sortedEntries(j + 1).Item2 = "Arbeitsende" AndAlso sortedEntries(j + 1).Item3 = baustelle Then
-                                i += 1
-                            End If
-                        Else
-                            ' Kein Blockende gefunden, Fehler
+                    ' Blockstart bestimmen
+                    If sortedEntries(i).Item2 = "Anfahrt" Then
+                        startFahrzeit = sortedEntries(i).Item1
+                        If i + 1 < sortedEntries.Count AndAlso sortedEntries(i + 1).Item2 = "Arbeitsbeginn" AndAlso sortedEntries(i + 1).Item3 = baustelle Then
+                            arbeitsbeginn = sortedEntries(i + 1).Item1
                             i += 1
+                        Else
+                            arbeitsbeginn = Nothing
                         End If
                     Else
-                        i += 1
+                        arbeitsbeginn = sortedEntries(i).Item1
                     End If
+
+                    ' Blockende bestimmen
+                    Dim blockEnd As DateTime? = Nothing
+                    Dim abfahrtZeit As DateTime? = Nothing
+                    Dim abfahrtGefunden As Boolean = False
+                    Dim arbeitsendeZeit As DateTime? = Nothing
+                    Dim blockEndIndex = i + 1
+                    For j = i + 1 To sortedEntries.Count - 1
+                        If sortedEntries(j).Item2 = "Abfahrt" AndAlso sortedEntries(j).Item3 = baustelle Then
+                            abfahrtZeit = sortedEntries(j).Item1
+                            abfahrtGefunden = True
+                            blockEnd = abfahrtZeit
+                            blockEndIndex = j
+                            Exit For
+                        End If
+                        If (sortedEntries(j).Item2 = "Anfahrt" Or sortedEntries(j).Item2 = "Arbeitsbeginn") AndAlso sortedEntries(j).Item3 <> baustelle Then
+                            blockEnd = sortedEntries(j).Item1
+                            blockEndIndex = j - 1
+                            Exit For
+                        End If
+                        If sortedEntries(j).Item2 = "Arbeitsende" AndAlso sortedEntries(j).Item3 = baustelle Then
+                            arbeitsendeZeit = sortedEntries(j).Item1
+                            blockEnd = arbeitsendeZeit
+                            blockEndIndex = j
+                            Exit For
+                        End If
+                    Next
+
+                    ' --- Arbeitszeit berechnen ---
+                    Dim arbeitszeitBereich As String = ""
+                    Dim arbeitszeit As Double = 0
+                    If arbeitsbeginn.HasValue AndAlso blockEnd.HasValue Then
+                        arbeitszeitBereich = $"{arbeitsbeginn.Value:HH:mm}–{blockEnd.Value:HH:mm}"
+                        arbeitszeit = (blockEnd.Value - arbeitsbeginn.Value).TotalMinutes / 60 - 0.75
+                        If arbeitszeit < 0 Then arbeitszeit = 0
+                    End If
+
+                    ' --- Fahrzeit hin berechnen ---
+                    Dim fahrzeitBereich As String = ""
+                    Dim fahrzeitGesamt As Double = 0
+                    If startFahrzeit.HasValue AndAlso arbeitsbeginn.HasValue Then
+                        fahrzeitBereich = $"{startFahrzeit.Value:HH:mm}–{arbeitsbeginn.Value:HH:mm}"
+                        fahrzeitGesamt += (arbeitsbeginn.Value - startFahrzeit.Value).TotalMinutes / 60
+                    End If
+
+                    ' --- Fahrzeit zurück berechnen (NUR wenn ein Abfahrt gefunden wurde) ---
+                    ' --- Fahrzeit zurück berechnen (NUR wenn ein Abfahrt gefunden wurde) ---
+                    If abfahrtGefunden Then
+                        ' Erstes: Suche Arbeitsende auf GLEICHER Baustelle und GLEICHEM TAG
+                        Dim fahrzeitRueckStart = abfahrtZeit.Value
+                        Dim fahrzeitRueckEnde As DateTime? = Nothing
+                        For k = blockEndIndex + 1 To sortedEntries.Count - 1
+                            If sortedEntries(k).Item2 = "Arbeitsende" AndAlso sortedEntries(k).Item3 = baustelle AndAlso sortedEntries(k).Item1.Date = datum Then
+                                fahrzeitRueckEnde = sortedEntries(k).Item1
+                                Exit For
+                            End If
+                        Next
+                        ' Falls nichts gefunden, fallback auf nächsten Arbeitsbeginn (wie bisher)
+                        If Not fahrzeitRueckEnde.HasValue Then
+                            For k = blockEndIndex + 1 To sortedEntries.Count - 1
+                                If sortedEntries(k).Item2 = "Arbeitsbeginn" Then
+                                    fahrzeitRueckEnde = sortedEntries(k).Item1
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If fahrzeitRueckEnde.HasValue AndAlso fahrzeitRueckEnde.Value > fahrzeitRueckStart Then
+                            fahrzeitBereich &= If(fahrzeitBereich <> "", ", ", "") & $"{fahrzeitRueckStart:HH:mm}–{fahrzeitRueckEnde.Value:HH:mm}"
+                            fahrzeitGesamt += (fahrzeitRueckEnde.Value - fahrzeitRueckStart).TotalMinutes / 60
+                        End If
+                    End If
+
+
+                    ' --- Status ---
+                    Dim status As String = "OK"
+                    If Not arbeitsbeginn.HasValue Or Not blockEnd.HasValue Then
+                        status = "FEHLERHAFT"
+                    End If
+
+                    ' --- Zeile hinzufügen ---
+                    Dim tagName = datum.ToString("dddd", New CultureInfo("de-DE"))
+                    Dim datumStr = datum.ToString("dd.MM.yyyy")
+                    tagesdaten.Rows.Add(tagName, datumStr, baustelle, fahrzeitBereich, arbeitszeitBereich, arbeitszeit.ToString("0.00"), fahrzeitGesamt.ToString("0.00"), status)
+
+                    ' Weiter hinter Block springen
+                    i = blockEndIndex + 1
                 Else
                     i += 1
                 End If

@@ -6,7 +6,7 @@
     <StartupObject>Sub Main</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
-    <Version>0.1.1</Version>
+    <Version>0.2.1.0</Version>
     <Authors>Jan Geiger</Authors>
     <Company>Jan Geiger Networking</Company>
     <Copyright>© 2025 Jan Geiger</Copyright>

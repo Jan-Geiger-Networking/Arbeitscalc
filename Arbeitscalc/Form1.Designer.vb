@@ -34,9 +34,14 @@ Partial Class Form1
         ExportierenToolStripMenuItem = New ToolStripMenuItem()
         InfoToolStripMenuItem = New ToolStripMenuItem()
         RechtlichesToolStripMenuItem = New ToolStripMenuItem()
+        SplitContainer1 = New SplitContainer()
         CType(dgvTagesdaten, ComponentModel.ISupportInitialize).BeginInit()
         CType(dgvSummen, ComponentModel.ISupportInitialize).BeginInit()
         MenuStrip1.SuspendLayout()
+        CType(SplitContainer1, ComponentModel.ISupportInitialize).BeginInit()
+        SplitContainer1.Panel1.SuspendLayout()
+        SplitContainer1.Panel2.SuspendLayout()
+        SplitContainer1.SuspendLayout()
         SuspendLayout()
         ' 
         ' openFileDialog1
@@ -47,24 +52,26 @@ Partial Class Form1
         ' 
         dgvTagesdaten.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         dgvTagesdaten.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        dgvTagesdaten.Location = New Point(12, 42)
+        dgvTagesdaten.Dock = DockStyle.Fill
+        dgvTagesdaten.Location = New Point(0, 0)
         dgvTagesdaten.Name = "dgvTagesdaten"
-        dgvTagesdaten.Size = New Size(1077, 422)
+        dgvTagesdaten.Size = New Size(1077, 489)
         dgvTagesdaten.TabIndex = 1
         ' 
         ' dgvSummen
         ' 
         dgvSummen.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         dgvSummen.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        dgvSummen.Location = New Point(12, 499)
+        dgvSummen.Dock = DockStyle.Fill
+        dgvSummen.Location = New Point(0, 0)
         dgvSummen.Name = "dgvSummen"
-        dgvSummen.Size = New Size(1077, 283)
+        dgvSummen.Size = New Size(1077, 262)
         dgvSummen.TabIndex = 2
         ' 
         ' LabelTagesdaten
         ' 
         LabelTagesdaten.AutoSize = True
-        LabelTagesdaten.Location = New Point(12, 24)
+        LabelTagesdaten.Location = New Point(0, 0)
         LabelTagesdaten.Name = "LabelTagesdaten"
         LabelTagesdaten.Size = New Size(67, 15)
         LabelTagesdaten.TabIndex = 3
@@ -73,7 +80,7 @@ Partial Class Form1
         ' LabelSummen
         ' 
         LabelSummen.AutoSize = True
-        LabelSummen.Location = New Point(12, 481)
+        LabelSummen.Location = New Point(0, 0)
         LabelSummen.Name = "LabelSummen"
         LabelSummen.Size = New Size(55, 15)
         LabelSummen.TabIndex = 4
@@ -119,30 +126,52 @@ Partial Class Form1
         RechtlichesToolStripMenuItem.Size = New Size(79, 20)
         RechtlichesToolStripMenuItem.Text = "Rechtliches"
         ' 
+        ' SplitContainer1
+        ' 
+        SplitContainer1.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        SplitContainer1.Location = New Point(12, 27)
+        SplitContainer1.Name = "SplitContainer1"
+        SplitContainer1.Orientation = Orientation.Horizontal
+        ' 
+        ' SplitContainer1.Panel1
+        ' 
+        SplitContainer1.Panel1.Controls.Add(LabelTagesdaten)
+        SplitContainer1.Panel1.Controls.Add(dgvTagesdaten)
+        ' 
+        ' SplitContainer1.Panel2
+        ' 
+        SplitContainer1.Panel2.Controls.Add(LabelSummen)
+        SplitContainer1.Panel2.Controls.Add(dgvSummen)
+        SplitContainer1.Size = New Size(1077, 755)
+        SplitContainer1.SplitterDistance = 489
+        SplitContainer1.TabIndex = 7
+        ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
-        AutoScaleMode = AutoScaleMode.Font
-        AutoSize = True
+        AutoScaleDimensions = New SizeF(96.0F, 96.0F)
+        AutoScaleMode = AutoScaleMode.Dpi
+        AutoSizeMode = AutoSizeMode.GrowAndShrink
         ClientSize = New Size(1101, 794)
-        Controls.Add(LabelSummen)
-        Controls.Add(LabelTagesdaten)
-        Controls.Add(dgvSummen)
-        Controls.Add(dgvTagesdaten)
         Controls.Add(MenuStrip1)
-        FormBorderStyle = FormBorderStyle.FixedSingle
+        Controls.Add(SplitContainer1)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MainMenuStrip = MenuStrip1
-        MinimumSize = New Size(1117, 833)
         Name = "Form1"
-        SizeGripStyle = SizeGripStyle.Show
+        StartPosition = FormStartPosition.CenterScreen
         Text = "Arbeitscalc by Jan Geiger Networking"
         CType(dgvTagesdaten, ComponentModel.ISupportInitialize).EndInit()
         CType(dgvSummen, ComponentModel.ISupportInitialize).EndInit()
         MenuStrip1.ResumeLayout(False)
         MenuStrip1.PerformLayout()
+        SplitContainer1.Panel1.ResumeLayout(False)
+        SplitContainer1.Panel1.PerformLayout()
+        SplitContainer1.Panel2.ResumeLayout(False)
+        SplitContainer1.Panel2.PerformLayout()
+        CType(SplitContainer1, ComponentModel.ISupportInitialize).EndInit()
+        SplitContainer1.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable
     End Sub
 
     Friend WithEvents openFileDialog1 As OpenFileDialog
@@ -156,5 +185,6 @@ Partial Class Form1
     Friend WithEvents ExportierenToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents InfoToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RechtlichesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SplitContainer1 As SplitContainer
 
 End Class

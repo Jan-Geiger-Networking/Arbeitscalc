@@ -3,15 +3,19 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
-    <StartupObject>Sub Main</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
-    <Version>0.2.1.0</Version>
+    <Version>0.2.1.1</Version>
     <Authors>Jan Geiger</Authors>
     <Company>Jan Geiger Networking</Company>
     <Copyright>© 2025 Jan Geiger</Copyright>
     <Description>Dieses Tool berechnet und dokumentiert Arbeits- und Fahrzeiten aus strukturierten Textdateien – inklusive Wochen-, Monats- und Jahresauswertung</Description>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Import Include="System.Data" />

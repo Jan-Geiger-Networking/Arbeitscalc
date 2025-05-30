@@ -30,8 +30,15 @@ Partial Class Form1
         LabelSummen = New Label()
         MenuStrip1 = New MenuStrip()
         ToolStripMenuItem1 = New ToolStripMenuItem()
+        ImportStripMenuItem = New ToolStripMenuItem()
+        CSVImportToolStripMenuItem = New ToolStripMenuItem()
         ÖffnenToolStripMenuItem = New ToolStripMenuItem()
         ExportierenToolStripMenuItem = New ToolStripMenuItem()
+        PDFToolStripMenuItem = New ToolStripMenuItem()
+        CSVToolStripMenuItem = New ToolStripMenuItem()
+        ToolsToolStripMenuItem = New ToolStripMenuItem()
+        PDSOnlineToolStripMenuItem1 = New ToolStripMenuItem()
+        GithubToolStripMenuItem = New ToolStripMenuItem()
         InfoToolStripMenuItem = New ToolStripMenuItem()
         RechtlichesToolStripMenuItem = New ToolStripMenuItem()
         SplitContainer1 = New SplitContainer()
@@ -88,7 +95,7 @@ Partial Class Form1
         ' 
         ' MenuStrip1
         ' 
-        MenuStrip1.Items.AddRange(New ToolStripItem() {ToolStripMenuItem1, InfoToolStripMenuItem, RechtlichesToolStripMenuItem})
+        MenuStrip1.Items.AddRange(New ToolStripItem() {ToolStripMenuItem1, ToolsToolStripMenuItem, InfoToolStripMenuItem, RechtlichesToolStripMenuItem})
         MenuStrip1.Location = New Point(0, 0)
         MenuStrip1.Name = "MenuStrip1"
         MenuStrip1.Size = New Size(1101, 24)
@@ -97,22 +104,67 @@ Partial Class Form1
         ' 
         ' ToolStripMenuItem1
         ' 
-        ToolStripMenuItem1.DropDownItems.AddRange(New ToolStripItem() {ÖffnenToolStripMenuItem, ExportierenToolStripMenuItem})
+        ToolStripMenuItem1.DropDownItems.AddRange(New ToolStripItem() {ImportStripMenuItem, ExportierenToolStripMenuItem})
         ToolStripMenuItem1.Name = "ToolStripMenuItem1"
         ToolStripMenuItem1.Size = New Size(46, 20)
         ToolStripMenuItem1.Text = "Datei"
         ' 
+        ' ImportStripMenuItem
+        ' 
+        ImportStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {CSVImportToolStripMenuItem, ÖffnenToolStripMenuItem})
+        ImportStripMenuItem.Name = "ImportStripMenuItem"
+        ImportStripMenuItem.Size = New Size(180, 22)
+        ImportStripMenuItem.Text = "Importieren"
+        ' 
+        ' CSVImportToolStripMenuItem
+        ' 
+        CSVImportToolStripMenuItem.Name = "CSVImportToolStripMenuItem"
+        CSVImportToolStripMenuItem.Size = New Size(174, 22)
+        CSVImportToolStripMenuItem.Text = "CSV"
+        ' 
         ' ÖffnenToolStripMenuItem
         ' 
         ÖffnenToolStripMenuItem.Name = "ÖffnenToolStripMenuItem"
-        ÖffnenToolStripMenuItem.Size = New Size(133, 22)
-        ÖffnenToolStripMenuItem.Text = "Öffnen"
+        ÖffnenToolStripMenuItem.Size = New Size(174, 22)
+        ÖffnenToolStripMenuItem.Text = "TXT (Experimental)"
         ' 
         ' ExportierenToolStripMenuItem
         ' 
+        ExportierenToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDFToolStripMenuItem, CSVToolStripMenuItem})
         ExportierenToolStripMenuItem.Name = "ExportierenToolStripMenuItem"
-        ExportierenToolStripMenuItem.Size = New Size(133, 22)
+        ExportierenToolStripMenuItem.Size = New Size(180, 22)
         ExportierenToolStripMenuItem.Text = "Exportieren"
+        ' 
+        ' PDFToolStripMenuItem
+        ' 
+        PDFToolStripMenuItem.Name = "PDFToolStripMenuItem"
+        PDFToolStripMenuItem.Size = New Size(95, 22)
+        PDFToolStripMenuItem.Text = "PDF"
+        ' 
+        ' CSVToolStripMenuItem
+        ' 
+        CSVToolStripMenuItem.Name = "CSVToolStripMenuItem"
+        CSVToolStripMenuItem.Size = New Size(95, 22)
+        CSVToolStripMenuItem.Text = "CSV"
+        ' 
+        ' ToolsToolStripMenuItem
+        ' 
+        ToolsToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDSOnlineToolStripMenuItem1, GithubToolStripMenuItem})
+        ToolsToolStripMenuItem.Name = "ToolsToolStripMenuItem"
+        ToolsToolStripMenuItem.Size = New Size(47, 20)
+        ToolsToolStripMenuItem.Text = "Tools"
+        ' 
+        ' PDSOnlineToolStripMenuItem1
+        ' 
+        PDSOnlineToolStripMenuItem1.Name = "PDSOnlineToolStripMenuItem1"
+        PDSOnlineToolStripMenuItem1.Size = New Size(180, 22)
+        PDSOnlineToolStripMenuItem1.Text = "PDS Online"
+        ' 
+        ' GithubToolStripMenuItem
+        ' 
+        GithubToolStripMenuItem.Name = "GithubToolStripMenuItem"
+        GithubToolStripMenuItem.Size = New Size(180, 22)
+        GithubToolStripMenuItem.Text = "Github"
         ' 
         ' InfoToolStripMenuItem
         ' 
@@ -171,7 +223,6 @@ Partial Class Form1
         SplitContainer1.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable
     End Sub
 
     Friend WithEvents openFileDialog1 As OpenFileDialog
@@ -181,10 +232,17 @@ Partial Class Form1
     Friend WithEvents LabelSummen As Label
     Friend WithEvents MenuStrip1 As MenuStrip
     Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
-    Friend WithEvents ÖffnenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ImportStripMenuItem As ToolStripMenuItem
     Friend WithEvents ExportierenToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents InfoToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RechtlichesToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SplitContainer1 As SplitContainer
+    Friend WithEvents CSVImportToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ÖffnenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PDFToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CSVToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PDSOnlineToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents GithubToolStripMenuItem As ToolStripMenuItem
 
 End Class

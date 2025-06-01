@@ -110,9 +110,8 @@ Public Class Form1
     Private Sub AktualisiereTageszeile(row As DataGridViewRow)
         Try
             Dim tagName = row.Cells("Tag").Value?.ToString()
-            Dim vergZeitStr = row.Cells("Vergütete Arbeitszeit (h)").Value?.ToString()
             Dim pausenzeitStr = row.Cells("Pausenzeit (h)").Value?.ToString()
-            Dim arbeitszeitStr = row.Cells("Arbeitszeit (h)").Value?.ToString() ' <-- Diese Zeile ergänzt!
+            Dim arbeitszeitStr = row.Cells("Arbeitszeit (h)").Value?.ToString()
 
             Dim arbeitszeit As Double = 0
             Dim pausenzeit As Double = 0
@@ -131,7 +130,13 @@ Public Class Form1
                 ueb25 = 0
                 ueb50 = 0
             End If
-            Dim vergütet As Double = soll + ueb25 * 1.25 + ueb50 * 1.5
+
+            Dim vergütet As Double
+            If arbeitszeit <= soll Then
+                vergütet = arbeitszeit
+            Else
+                vergütet = soll + ueb25 * 1.25 + ueb50 * 1.5
+            End If
 
             row.Cells("Überstunden (h)").Value = uebersoll.ToString("0.00")
             row.Cells("Überstd. 25% (h)").Value = ueb25.ToString("0.00")
@@ -213,156 +218,137 @@ Public Class Form1
         tagesdaten.Columns.Add("Vergütete Arbeitszeit (h)")
         tagesdaten.Columns.Add("Datenintegrität")
 
-        Dim i As Integer = 0
-        While i < sortedEntries.Count
-            If sortedEntries(i).Item2 = "Anfahrt" Or sortedEntries(i).Item2 = "Arbeitsbeginn" Then
+        ' Blöcke bauen: Jeder Block = Arbeitsbeginn...Arbeitsende/Abfahrt/Arbeitsbeginn (nächster)
+        Dim blocks As New List(Of (Datum As Date, TagName As String, Baustelle As String, Bemerkung As String, Anfahrt As (Von As DateTime, Bis As DateTime)?, Arbeitszeit As (Von As DateTime, Bis As DateTime), Abfahrt As (Von As DateTime, Bis As DateTime)?))
+        For i = 0 To sortedEntries.Count - 1
+            If sortedEntries(i).Item2 = "Arbeitsbeginn" Then
                 Dim baustelle = sortedEntries(i).Item3
+                Dim bemerkung = sortedEntries(i).Item4
                 Dim datum = sortedEntries(i).Item1.Date
+                Dim arbeitsStart = sortedEntries(i).Item1
 
-                ' Alle Bemerkungen für diesen Block sammeln:
-                Dim bemerkungenList As New List(Of String)
-                Dim blockEndIndex = i
-                For j = i To sortedEntries.Count - 1
-                    If sortedEntries(j).Item1.Date <> datum OrElse sortedEntries(j).Item3 <> baustelle Then
-                        Exit For
-                    End If
-                    Dim bemerkung = sortedEntries(j).Item4
-                    If Not String.IsNullOrWhiteSpace(bemerkung) AndAlso Not bemerkungenList.Contains(bemerkung) Then
-                        bemerkungenList.Add(bemerkung)
-                    End If
-                    blockEndIndex = j
-                Next
-                Dim bemerkungenText As String = String.Join(" | ", bemerkungenList)
-
-                Dim startFahrzeit As DateTime? = Nothing
-                Dim arbeitsbeginn As DateTime? = Nothing
-
-                If sortedEntries(i).Item2 = "Anfahrt" Then
-                    startFahrzeit = sortedEntries(i).Item1
-                    If i + 1 < sortedEntries.Count AndAlso sortedEntries(i + 1).Item2 = "Arbeitsbeginn" AndAlso sortedEntries(i + 1).Item3 = baustelle Then
-                        arbeitsbeginn = sortedEntries(i + 1).Item1
-                        i += 1
-                    Else
-                        arbeitsbeginn = Nothing
-                    End If
-                Else
-                    arbeitsbeginn = sortedEntries(i).Item1
+                ' Suche passende Anfahrt (sofort davor, gleiche Baustelle)
+                Dim anfahrt As (Von As DateTime, Bis As DateTime)? = Nothing
+                If i > 0 AndAlso sortedEntries(i - 1).Item2 = "Anfahrt" AndAlso sortedEntries(i - 1).Item3 = baustelle Then
+                    anfahrt = (sortedEntries(i - 1).Item1, sortedEntries(i).Item1)
                 End If
 
-                Dim blockEnd As DateTime? = Nothing
-                Dim abfahrtZeit As DateTime? = Nothing
-                Dim abfahrtGefunden As Boolean = False
-                Dim arbeitsendeZeit As DateTime? = Nothing
-                For j = i + 1 To sortedEntries.Count - 1
+                ' Arbeitsende: nächster "Abfahrt" oder "Arbeitsende" oder "Arbeitsbeginn" einer anderen Baustelle
+                Dim arbeitsEnde = arbeitsStart
+                Dim abfahrt As (Von As DateTime, Bis As DateTime)? = Nothing
+                Dim j = i + 1
+                While j < sortedEntries.Count
                     If sortedEntries(j).Item2 = "Abfahrt" AndAlso sortedEntries(j).Item3 = baustelle Then
-                        abfahrtZeit = sortedEntries(j).Item1
-                        abfahrtGefunden = True
-                        blockEnd = abfahrtZeit
-                        blockEndIndex = j
-                        Exit For
-                    End If
-                    If (sortedEntries(j).Item2 = "Anfahrt" Or sortedEntries(j).Item2 = "Arbeitsbeginn") AndAlso sortedEntries(j).Item3 <> baustelle Then
-                        blockEnd = sortedEntries(j).Item1
-                        blockEndIndex = j - 1
-                        Exit For
-                    End If
-                    If sortedEntries(j).Item2 = "Arbeitsende" AndAlso sortedEntries(j).Item3 = baustelle Then
-                        arbeitsendeZeit = sortedEntries(j).Item1
-                        blockEnd = arbeitsendeZeit
-                        blockEndIndex = j
-                        Exit For
-                    End If
-                Next
-
-                Dim arbeitszeitBereich As String = ""
-                Dim arbeitszeit As Double = 0
-                Dim pausenzeit As Double = 0.75 ' Standard: Mo–Do
-
-                Dim tagName = datum.ToString("dddd", New CultureInfo("de-DE"))
-                If tagName.ToLower() = "freitag" Then
-                    pausenzeit = 0.25
-                End If
-
-                If arbeitsbeginn.HasValue AndAlso blockEnd.HasValue Then
-                    arbeitszeitBereich = $"{arbeitsbeginn.Value:HH:mm}–{blockEnd.Value:HH:mm}"
-                    arbeitszeit = (blockEnd.Value - arbeitsbeginn.Value).TotalMinutes / 60 - pausenzeit
-                    If arbeitszeit < 0 Then arbeitszeit = 0
-                End If
-
-                Dim soll As Double = If(tagName.ToLower() = "freitag", 6, 8)
-                Dim uebersoll As Double = 0
-                Dim ueb25 As Double = 0
-                Dim ueb50 As Double = 0
-                If arbeitszeit > soll Then
-                    uebersoll = arbeitszeit - soll
-                    ueb25 = Math.Min(2, uebersoll)
-                    ueb50 = Math.Max(0, uebersoll - 2)
-                Else
-                    uebersoll = 0
-                    ueb25 = 0
-                    ueb50 = 0
-                End If
-
-                Dim vergütet As Double = soll + ueb25 * 1.25 + ueb50 * 1.5
-
-                Dim fahrzeitBereich As String = ""
-                Dim fahrzeitGesamt As Double = 0
-                If startFahrzeit.HasValue AndAlso arbeitsbeginn.HasValue Then
-                    fahrzeitBereich = $"{startFahrzeit.Value:HH:mm}–{arbeitsbeginn.Value:HH:mm}"
-                    fahrzeitGesamt += (arbeitsbeginn.Value - startFahrzeit.Value).TotalMinutes / 60
-                End If
-
-                If abfahrtGefunden Then
-                    Dim fahrzeitRueckStart = abfahrtZeit.Value
-                    Dim fahrzeitRueckEnde As DateTime? = Nothing
-                    For k = blockEndIndex + 1 To sortedEntries.Count - 1
-                        If sortedEntries(k).Item2 = "Arbeitsende" AndAlso sortedEntries(k).Item3 = baustelle AndAlso sortedEntries(k).Item1.Date = datum Then
-                            fahrzeitRueckEnde = sortedEntries(k).Item1
-                            Exit For
+                        arbeitsEnde = sortedEntries(j).Item1
+                        ' Guck, ob danach (sofort!) ein Arbeitsende kommt (selbe Baustelle)
+                        If j + 1 < sortedEntries.Count AndAlso sortedEntries(j + 1).Item2 = "Arbeitsende" AndAlso sortedEntries(j + 1).Item3 = baustelle Then
+                            abfahrt = (sortedEntries(j).Item1, sortedEntries(j + 1).Item1)
+                        Else
+                            ' Suche die nächste Arbeitsbeginn-Zeit (egal welche Baustelle) nach der Abfahrt
+                            Dim abfahrtBis As DateTime = sortedEntries(j).Item1
+                            For k = j + 1 To sortedEntries.Count - 1
+                                If sortedEntries(k).Item2 = "Arbeitsbeginn" Then
+                                    abfahrtBis = sortedEntries(k).Item1
+                                    Exit For
+                                End If
+                            Next
+                            abfahrt = (sortedEntries(j).Item1, abfahrtBis)
                         End If
-                    Next
-                    If Not fahrzeitRueckEnde.HasValue Then
-                        For k = blockEndIndex + 1 To sortedEntries.Count - 1
-                            If sortedEntries(k).Item2 = "Arbeitsbeginn" Then
-                                fahrzeitRueckEnde = sortedEntries(k).Item1
-                                Exit For
-                            End If
-                        Next
+                        Exit While
+                    ElseIf sortedEntries(j).Item2 = "Arbeitsbeginn" Then
+                        arbeitsEnde = sortedEntries(j).Item1
+                        Exit While
+                    ElseIf sortedEntries(j).Item2 = "Arbeitsende" AndAlso sortedEntries(j).Item3 = baustelle Then
+                        arbeitsEnde = sortedEntries(j).Item1
+                        Exit While
                     End If
-                    If fahrzeitRueckEnde.HasValue AndAlso fahrzeitRueckEnde.Value > fahrzeitRueckStart Then
-                        fahrzeitBereich &= If(fahrzeitBereich <> "", ", ", "") & $"{fahrzeitRueckStart:HH:mm}–{fahrzeitRueckEnde.Value:HH:mm}"
-                        fahrzeitGesamt += (fahrzeitRueckEnde.Value - fahrzeitRueckStart).TotalMinutes / 60
-                    End If
-                End If
+                    j += 1
+                End While
 
-                Dim status As String = "OK"
-                If Not arbeitsbeginn.HasValue Or Not blockEnd.HasValue Then
-                    status = "FEHLERHAFT"
-                End If
-
-                Dim datumStr = datum.ToString("dd.MM.yyyy")
-                tagesdaten.Rows.Add(
-                    tagName,
-                    datumStr,
-                    baustelle,
-                    bemerkungenText,
-                    fahrzeitBereich,
-                    arbeitszeitBereich,
-                    pausenzeit.ToString("0.00"),
-                    arbeitszeit.ToString("0.00"),
-                    fahrzeitGesamt.ToString("0.00"),
-                    uebersoll.ToString("0.00"),
-                    ueb25.ToString("0.00"),
-                    ueb50.ToString("0.00"),
-                    vergütet.ToString("0.00"),
-                    status
-                )
-
-                i = blockEndIndex + 1
-            Else
-                i += 1
+                blocks.Add((datum, datum.ToString("dddd", New CultureInfo("de-DE")), baustelle, bemerkung, anfahrt, (arbeitsStart, arbeitsEnde), abfahrt))
             End If
-        End While
+        Next
+
+        ' Bemerkungen pro Tag sammeln
+        Dim bemerkungenProTag As New Dictionary(Of Date, String)
+        For Each e In sortedEntries
+            If Not String.IsNullOrWhiteSpace(e.Item4) Then
+                Dim d = e.Item1.Date
+                If Not bemerkungenProTag.ContainsKey(d) Then
+                    bemerkungenProTag(d) = e.Item4
+                ElseIf Not bemerkungenProTag(d).Contains(e.Item4) Then
+                    bemerkungenProTag(d) &= ", " & e.Item4
+                End If
+            End If
+        Next
+
+        ' Nach Tagen gruppieren, Überstunden aufteilen, Pausenregel: Nur erster Block bekommt Pause
+        For Each taggruppe In blocks.GroupBy(Function(b) b.Datum).OrderBy(Function(g) g.Key)
+            Dim blocksThisDay = taggruppe.ToList()
+            Dim tagName = blocksThisDay.First().TagName
+            Dim datum = blocksThisDay.First().Datum
+            Dim soll = If(tagName.ToLower() = "freitag", 6.0, 8.0)
+            Dim bemerkungenText As String = If(bemerkungenProTag.ContainsKey(datum), bemerkungenProTag(datum), "")
+
+            Dim pausenList As New List(Of Double)
+            For idx = 0 To blocksThisDay.Count - 1
+                pausenList.Add(If(idx = 0, If(tagName.ToLower() = "freitag", 0.25, 0.75), 0))
+            Next
+
+            ' Alle Arbeitszeiten und Fahrzeiten für Überstundenverteilung
+            Dim arbeitszeiten = blocksThisDay.Select(Function(b, idx) Math.Max(0, (b.Arbeitszeit.Bis - b.Arbeitszeit.Von).TotalMinutes / 60 - pausenList(idx))).ToList()
+            Dim fahrzeiten = blocksThisDay.Select(Function(b)
+                                                      Dim ft As Double = 0
+                                                      If b.Anfahrt.HasValue Then ft += (b.Anfahrt.Value.Bis - b.Anfahrt.Value.Von).TotalMinutes / 60
+                                                      If b.Abfahrt.HasValue Then ft += (b.Abfahrt.Value.Bis - b.Abfahrt.Value.Von).TotalMinutes / 60
+                                                      Return ft
+                                                  End Function).ToList()
+            Dim sumArbeitszeit = arbeitszeiten.Sum()
+            Dim sumFahrzeit = fahrzeiten.Sum()
+            Dim uebersoll = Math.Max(0, sumArbeitszeit - soll)
+            Dim ueb25 = Math.Min(2, uebersoll)
+            Dim ueb50 = Math.Max(0, uebersoll - 2)
+            Dim verguetung = Math.Min(sumArbeitszeit, soll) + ueb25 * 1.25 + ueb50 * 1.5
+
+            For idx = 0 To blocksThisDay.Count - 1
+                Dim b = blocksThisDay(idx)
+                Dim arbeitszeit = arbeitszeiten(idx)
+                Dim fahrzeit = fahrzeiten(idx)
+                Dim pause = pausenList(idx)
+                Dim anteil = If(sumArbeitszeit > 0, arbeitszeit / sumArbeitszeit, 0)
+                Dim ueber = uebersoll * anteil
+                Dim u25 = ueb25 * anteil
+                Dim u50 = ueb50 * anteil
+                Dim verg = verguetung * anteil
+
+                ' Korrekte Fahrzeit-Zeiträume: Nur was zu diesem Block gehört!
+                Dim fahrzeitStr As String = ""
+                If b.Anfahrt.HasValue Then
+                    fahrzeitStr = $"{b.Anfahrt.Value.Von:HH:mm}–{b.Anfahrt.Value.Bis:HH:mm}"
+                End If
+                If b.Abfahrt.HasValue Then
+                    If fahrzeitStr <> "" Then fahrzeitStr &= ", "
+                    fahrzeitStr &= $"{b.Abfahrt.Value.Von:HH:mm}–{b.Abfahrt.Value.Bis:HH:mm}"
+                End If
+
+                tagesdaten.Rows.Add(
+            tagName,
+            datum.ToString("dd.MM.yyyy"),
+            b.Baustelle,
+            bemerkungenText,
+            fahrzeitStr,
+            $"{b.Arbeitszeit.Von:HH:mm}–{b.Arbeitszeit.Bis:HH:mm}",
+            pause.ToString("0.00"),
+            arbeitszeit.ToString("0.00"),
+            fahrzeit.ToString("0.00"),
+            ueber.ToString("0.00"),
+            u25.ToString("0.00"),
+            u50.ToString("0.00"),
+            verg.ToString("0.00"),
+            "OK"
+        )
+            Next
+        Next
 
         dgvTagesdaten.DataSource = tagesdaten
         dgvTagesdaten.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
@@ -371,6 +357,9 @@ Public Class Form1
 
         AktualisiereSummen()
     End Sub
+
+
+
 
     ' ===== Menü- und Export/Import =======================================
 
@@ -622,5 +611,9 @@ Public Class Form1
                 MessageBox.Show("Nur CSV oder TXT Dateien können importiert werden!")
             End If
         End If
+    End Sub
+
+    Private Sub SupportUndBugReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SupportUndBugReportToolStripMenuItem.Click
+        Process.Start(New ProcessStartInfo("https://jgnet.eu/arbeitscalc-support") With {.UseShellExecute = True})
     End Sub
 End Class

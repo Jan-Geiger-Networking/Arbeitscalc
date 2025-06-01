@@ -43,6 +43,7 @@ Partial Class Form1
         InfoToolStripMenuItem = New ToolStripMenuItem()
         RechtlichesToolStripMenuItem = New ToolStripMenuItem()
         SplitContainer1 = New SplitContainer()
+        SupportUndBugReportToolStripMenuItem = New ToolStripMenuItem()
         CType(dgvTagesdaten, ComponentModel.ISupportInitialize).BeginInit()
         CType(dgvSummen, ComponentModel.ISupportInitialize).BeginInit()
         MenuStrip1.SuspendLayout()
@@ -152,7 +153,7 @@ Partial Class Form1
         ' 
         ' ToolsToolStripMenuItem
         ' 
-        ToolsToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDSOnlineToolStripMenuItem1, GithubToolStripMenuItem, JGNSchlaubereichToolStripMenuItem})
+        ToolsToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDSOnlineToolStripMenuItem1, GithubToolStripMenuItem, JGNSchlaubereichToolStripMenuItem, SupportUndBugReportToolStripMenuItem})
         ToolsToolStripMenuItem.Name = "ToolsToolStripMenuItem"
         ToolsToolStripMenuItem.Size = New Size(47, 20)
         ToolsToolStripMenuItem.Text = "Tools"
@@ -160,19 +161,19 @@ Partial Class Form1
         ' PDSOnlineToolStripMenuItem1
         ' 
         PDSOnlineToolStripMenuItem1.Name = "PDSOnlineToolStripMenuItem1"
-        PDSOnlineToolStripMenuItem1.Size = New Size(133, 22)
+        PDSOnlineToolStripMenuItem1.Size = New Size(202, 22)
         PDSOnlineToolStripMenuItem1.Text = "PDS Online"
         ' 
         ' GithubToolStripMenuItem
         ' 
         GithubToolStripMenuItem.Name = "GithubToolStripMenuItem"
-        GithubToolStripMenuItem.Size = New Size(133, 22)
+        GithubToolStripMenuItem.Size = New Size(202, 22)
         GithubToolStripMenuItem.Text = "Github"
         ' 
         ' JGNSchlaubereichToolStripMenuItem
         ' 
         JGNSchlaubereichToolStripMenuItem.Name = "JGNSchlaubereichToolStripMenuItem"
-        JGNSchlaubereichToolStripMenuItem.Size = New Size(133, 22)
+        JGNSchlaubereichToolStripMenuItem.Size = New Size(202, 22)
         JGNSchlaubereichToolStripMenuItem.Text = "JGN Schlau"
         ' 
         ' InfoToolStripMenuItem
@@ -207,6 +208,12 @@ Partial Class Form1
         SplitContainer1.Size = New Size(1077, 755)
         SplitContainer1.SplitterDistance = 489
         SplitContainer1.TabIndex = 7
+        ' 
+        ' SupportUndBugReportToolStripMenuItem
+        ' 
+        SupportUndBugReportToolStripMenuItem.Name = "SupportUndBugReportToolStripMenuItem"
+        SupportUndBugReportToolStripMenuItem.Size = New Size(202, 22)
+        SupportUndBugReportToolStripMenuItem.Text = "Support und Bug Report"
         ' 
         ' Form1
         ' 
@@ -256,5 +263,6 @@ Partial Class Form1
     Friend WithEvents PDSOnlineToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents GithubToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents JGNSchlaubereichToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SupportUndBugReportToolStripMenuItem As ToolStripMenuItem
 
 End Class

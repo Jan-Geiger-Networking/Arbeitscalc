@@ -82,7 +82,9 @@ Public Class Form1
     End Sub
 
     Private Sub dgvTagesdaten_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles dgvTagesdaten.CellValueChanged
-        If dgvTagesdaten.Columns(e.ColumnIndex).HeaderText = "Pausenzeit (h)" Then
+        Dim spaltenname = dgvTagesdaten.Columns(e.ColumnIndex).HeaderText
+
+        If spaltenname = "Pausenzeit (h)" OrElse spaltenname = "Arbeitszeit-Zeitraum" Then
             Dim row = dgvTagesdaten.Rows(e.RowIndex)
             Dim bereich = row.Cells("Arbeitszeit-Zeitraum").Value?.ToString()
             Dim pausenStr = row.Cells("Pausenzeit (h)").Value?.ToString()
@@ -92,7 +94,7 @@ Public Class Form1
                 Dim teile = bereich.Split("–"c)
                 Dim t1, t2 As DateTime
                 If DateTime.TryParseExact(teile(0).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t1) AndAlso
-                   DateTime.TryParseExact(teile(1).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t2) Then
+               DateTime.TryParseExact(teile(1).Trim(), "HH:mm", Nothing, Globalization.DateTimeStyles.None, t2) Then
                     Dim pausen As Double = 0
                     Double.TryParse(pausenStr.Replace(",", "."), Globalization.NumberStyles.Any, Globalization.CultureInfo.InvariantCulture, pausen)
                     neueArbeitszeit = (t2 - t1).TotalMinutes / 60 - pausen
@@ -153,17 +155,18 @@ Public Class Form1
         summenTabelle.Columns.Add("Zeitraum")
         summenTabelle.Columns.Add("Arbeitszeit (h)")
         summenTabelle.Columns.Add("Fahrzeit (h)")
+        summenTabelle.Columns.Add("Überstunden (h)") ' Neue Spalte
 
-        Dim summenProWoche As New Dictionary(Of Integer, Tuple(Of Double, Double))()
-        Dim summenProMonat As New Dictionary(Of String, Tuple(Of Double, Double))()
-        Dim summenProJahr As New Dictionary(Of Integer, Tuple(Of Double, Double))()
+        Dim summenProWoche As New Dictionary(Of Integer, Tuple(Of Double, Double, Double))()
+        Dim summenProMonat As New Dictionary(Of String, Tuple(Of Double, Double, Double))()
+        Dim summenProJahr As New Dictionary(Of Integer, Tuple(Of Double, Double, Double))()
 
         For Each row As DataGridViewRow In dgvTagesdaten.Rows
             If Not row.IsNewRow Then
                 Dim datumStr = row.Cells("Datum").Value?.ToString()
-                ' Neu: Vergütete Arbeitszeit (h) summieren!
                 Dim vergZeitStr = row.Cells("Vergütete Arbeitszeit (h)").Value?.ToString()
                 Dim fahrzeitStr = row.Cells("Fahrzeit (h)").Value?.ToString()
+                Dim ueberstundenStr = row.Cells("Überstunden (h)").Value?.ToString()
 
                 If DateTime.TryParseExact(datumStr, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, Nothing) Then
                     Dim datum = DateTime.ParseExact(datumStr, "dd.MM.yyyy", CultureInfo.InvariantCulture)
@@ -173,32 +176,52 @@ Public Class Form1
 
                     Dim aVal = If(IsNumeric(vergZeitStr), Convert.ToDouble(vergZeitStr), 0.0)
                     Dim fVal = If(IsNumeric(fahrzeitStr), Convert.ToDouble(fahrzeitStr), 0.0)
+                    Dim uVal = If(IsNumeric(ueberstundenStr), Convert.ToDouble(ueberstundenStr), 0.0)
 
-                    If Not summenProWoche.ContainsKey(kw) Then summenProWoche(kw) = Tuple.Create(0.0, 0.0)
-                    summenProWoche(kw) = Tuple.Create(summenProWoche(kw).Item1 + aVal, summenProWoche(kw).Item2 + fVal)
+                    If Not summenProWoche.ContainsKey(kw) Then summenProWoche(kw) = Tuple.Create(0.0, 0.0, 0.0)
+                    summenProWoche(kw) = Tuple.Create(
+                    summenProWoche(kw).Item1 + aVal,
+                    summenProWoche(kw).Item2 + fVal,
+                    summenProWoche(kw).Item3 + uVal)
 
-                    If Not summenProMonat.ContainsKey(monat) Then summenProMonat(monat) = Tuple.Create(0.0, 0.0)
-                    summenProMonat(monat) = Tuple.Create(summenProMonat(monat).Item1 + aVal, summenProMonat(monat).Item2 + fVal)
+                    If Not summenProMonat.ContainsKey(monat) Then summenProMonat(monat) = Tuple.Create(0.0, 0.0, 0.0)
+                    summenProMonat(monat) = Tuple.Create(
+                    summenProMonat(monat).Item1 + aVal,
+                    summenProMonat(monat).Item2 + fVal,
+                    summenProMonat(monat).Item3 + uVal)
 
-                    If Not summenProJahr.ContainsKey(jahr) Then summenProJahr(jahr) = Tuple.Create(0.0, 0.0)
-                    summenProJahr(jahr) = Tuple.Create(summenProJahr(jahr).Item1 + aVal, summenProJahr(jahr).Item2 + fVal)
+                    If Not summenProJahr.ContainsKey(jahr) Then summenProJahr(jahr) = Tuple.Create(0.0, 0.0, 0.0)
+                    summenProJahr(jahr) = Tuple.Create(
+                    summenProJahr(jahr).Item1 + aVal,
+                    summenProJahr(jahr).Item2 + fVal,
+                    summenProJahr(jahr).Item3 + uVal)
                 End If
             End If
         Next
 
         For Each eintrag In summenProWoche
-            summenTabelle.Rows.Add("Woche", $"KW {eintrag.Key}", Math.Round(eintrag.Value.Item1, 2).ToString("0.00"), Math.Round(eintrag.Value.Item2, 2).ToString("0.00"))
+            summenTabelle.Rows.Add("Woche", $"KW {eintrag.Key}",
+            Math.Round(eintrag.Value.Item1, 2).ToString("0.00"),
+            Math.Round(eintrag.Value.Item2, 2).ToString("0.00"),
+            Math.Round(eintrag.Value.Item3, 2).ToString("0.00"))
         Next
         For Each eintrag In summenProMonat
-            summenTabelle.Rows.Add("Monat", eintrag.Key, Math.Round(eintrag.Value.Item1, 2).ToString("0.00"), Math.Round(eintrag.Value.Item2, 2).ToString("0.00"))
+            summenTabelle.Rows.Add("Monat", eintrag.Key,
+            Math.Round(eintrag.Value.Item1, 2).ToString("0.00"),
+            Math.Round(eintrag.Value.Item2, 2).ToString("0.00"),
+            Math.Round(eintrag.Value.Item3, 2).ToString("0.00"))
         Next
         For Each eintrag In summenProJahr
-            summenTabelle.Rows.Add("Jahr", eintrag.Key.ToString(), Math.Round(eintrag.Value.Item1, 2).ToString("0.00"), Math.Round(eintrag.Value.Item2, 2).ToString("0.00"))
+            summenTabelle.Rows.Add("Jahr", eintrag.Key.ToString(),
+            Math.Round(eintrag.Value.Item1, 2).ToString("0.00"),
+            Math.Round(eintrag.Value.Item2, 2).ToString("0.00"),
+            Math.Round(eintrag.Value.Item3, 2).ToString("0.00"))
         Next
 
         dgvSummen.DataSource = summenTabelle
         dgvSummen.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
     End Sub
+
 
     Private Sub EintraegeZuTabelleMitBemerkung(entries As List(Of Tuple(Of DateTime, String, String, String)))
         Dim sortedEntries = entries.OrderBy(Function(x) x.Item1).ToList()
@@ -290,9 +313,28 @@ Public Class Form1
             Dim soll = If(tagName.ToLower() = "freitag", 6.0, 8.0)
             Dim bemerkungenText As String = If(bemerkungenProTag.ContainsKey(datum), bemerkungenProTag(datum), "")
 
+            ' Pausenregel je nach Wochentag
+            Dim pausenzeiten As New List(Of Tuple(Of TimeSpan, Double))
+            If tagName.ToLower() = "freitag" Then
+                pausenzeiten.Add(Tuple.Create(New TimeSpan(9, 0, 0), 0.25)) ' nur Frühstückspause
+            Else
+                pausenzeiten.Add(Tuple.Create(New TimeSpan(9, 0, 0), 0.25))  ' Frühstückspause
+                pausenzeiten.Add(Tuple.Create(New TimeSpan(12, 0, 0), 0.5))  ' Mittagspause
+            End If
+
             Dim pausenList As New List(Of Double)
-            For idx = 0 To blocksThisDay.Count - 1
-                pausenList.Add(If(idx = 0, If(tagName.ToLower() = "freitag", 0.25, 0.75), 0))
+            For Each block In blocksThisDay
+                Dim blockVon = block.Arbeitszeit.Von.TimeOfDay
+                Dim blockBis = block.Arbeitszeit.Bis.TimeOfDay
+                Dim pauseInBlock As Double = 0
+
+                For Each pause In pausenzeiten
+                    ' Prüfe ob die Pause in den Block fällt (Startzeit < Pause < Endzeit)
+                    If blockVon <= pause.Item1 AndAlso pause.Item1 < blockBis Then
+                        pauseInBlock += pause.Item2
+                    End If
+                Next
+                pausenList.Add(pauseInBlock)
             Next
 
             ' Alle Arbeitszeiten und Fahrzeiten für Überstundenverteilung
@@ -359,15 +401,6 @@ Public Class Form1
     End Sub
 
 
-
-
-    ' ===== Menü- und Export/Import =======================================
-
-    Private Sub InfoToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles InfoToolStripMenuItem.Click
-        Dim about As New About()
-        about.ShowDialog()
-    End Sub
-
     Private Sub RechtlichesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RechtlichesToolStripMenuItem.Click
         Dim about As New Rechtliches()
         about.ShowDialog()
@@ -389,9 +422,24 @@ Public Class Form1
     End Sub
 
     Private Sub ExportierePDF()
-        Dim monat = DateTime.Now.ToString("MMMM", New CultureInfo("de-DE"))
-        Dim jahr = DateTime.Now.Year.ToString()
-        Dim filename = $"Stundenbericht {monat} {jahr}.pdf"
+        ' Das erste Datum aus der Tabelle suchen (sofern vorhanden)
+        Dim ersterMonat As String = DateTime.Now.ToString("MMMM", New CultureInfo("de-DE"))
+        Dim erstesJahr As String = DateTime.Now.Year.ToString()
+
+        For Each row As DataGridViewRow In dgvTagesdaten.Rows
+            If Not row.IsNewRow Then
+                Dim datumStr = row.Cells("Datum").Value?.ToString()
+                Dim dat As DateTime
+                If DateTime.TryParseExact(datumStr, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, dat) Then
+                    ersterMonat = dat.ToString("MMMM", New CultureInfo("de-DE"))
+                    erstesJahr = dat.Year.ToString()
+                    Exit For ' nur den ersten Eintrag nehmen
+                End If
+            End If
+        Next
+
+        Dim filename = $"Stundenbericht {ersterMonat} {erstesJahr}.pdf"
+
 
         Dim sfd As New SaveFileDialog()
         sfd.FileName = filename
@@ -402,7 +450,7 @@ Public Class Form1
             PdfWriter.GetInstance(doc, New System.IO.FileStream(sfd.FileName, System.IO.FileMode.Create))
             doc.Open()
 
-            doc.Add(New Paragraph("Stundenbericht " & monat & " " & jahr, FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16)))
+            doc.Add(New Paragraph("Stundenbericht " & ersterMonat & " " & erstesJahr, FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16)))
             doc.Add(New Paragraph("Erstellt am: " & DateTime.Now.ToString("dd.MM.yyyy")))
             doc.Add(New Paragraph(" "))
 
@@ -615,5 +663,15 @@ Public Class Form1
 
     Private Sub SupportUndBugReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SupportUndBugReportToolStripMenuItem.Click
         Process.Start(New ProcessStartInfo("https://jgnet.eu/arbeitscalc-support") With {.UseShellExecute = True})
+    End Sub
+
+    Private Sub InfosZumProgrammToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles InfosZumProgrammToolStripMenuItem.Click
+        Dim about As New About()
+        about.ShowDialog()
+    End Sub
+
+    Private Sub PDSExportUndStempelnToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PDSExportUndStempelnToolStripMenuItem.Click
+        Dim about As New Infos()
+        about.ShowDialog()
     End Sub
 End Class

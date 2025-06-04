@@ -40,10 +40,12 @@ Partial Class Form1
         PDSOnlineToolStripMenuItem1 = New ToolStripMenuItem()
         GithubToolStripMenuItem = New ToolStripMenuItem()
         JGNSchlaubereichToolStripMenuItem = New ToolStripMenuItem()
+        SupportUndBugReportToolStripMenuItem = New ToolStripMenuItem()
         InfoToolStripMenuItem = New ToolStripMenuItem()
+        PDSExportUndStempelnToolStripMenuItem = New ToolStripMenuItem()
+        InfosZumProgrammToolStripMenuItem = New ToolStripMenuItem()
         RechtlichesToolStripMenuItem = New ToolStripMenuItem()
         SplitContainer1 = New SplitContainer()
-        SupportUndBugReportToolStripMenuItem = New ToolStripMenuItem()
         CType(dgvTagesdaten, ComponentModel.ISupportInitialize).BeginInit()
         CType(dgvSummen, ComponentModel.ISupportInitialize).BeginInit()
         MenuStrip1.SuspendLayout()
@@ -176,11 +178,30 @@ Partial Class Form1
         JGNSchlaubereichToolStripMenuItem.Size = New Size(202, 22)
         JGNSchlaubereichToolStripMenuItem.Text = "JGN Schlau"
         ' 
+        ' SupportUndBugReportToolStripMenuItem
+        ' 
+        SupportUndBugReportToolStripMenuItem.Name = "SupportUndBugReportToolStripMenuItem"
+        SupportUndBugReportToolStripMenuItem.Size = New Size(202, 22)
+        SupportUndBugReportToolStripMenuItem.Text = "Support und Bug Report"
+        ' 
         ' InfoToolStripMenuItem
         ' 
+        InfoToolStripMenuItem.DropDownItems.AddRange(New ToolStripItem() {PDSExportUndStempelnToolStripMenuItem, InfosZumProgrammToolStripMenuItem})
         InfoToolStripMenuItem.Name = "InfoToolStripMenuItem"
-        InfoToolStripMenuItem.Size = New Size(40, 20)
-        InfoToolStripMenuItem.Text = "Info"
+        InfoToolStripMenuItem.Size = New Size(45, 20)
+        InfoToolStripMenuItem.Text = "Infos"
+        ' 
+        ' PDSExportUndStempelnToolStripMenuItem
+        ' 
+        PDSExportUndStempelnToolStripMenuItem.Name = "PDSExportUndStempelnToolStripMenuItem"
+        PDSExportUndStempelnToolStripMenuItem.Size = New Size(208, 22)
+        PDSExportUndStempelnToolStripMenuItem.Text = "PDS Export und Stempeln"
+        ' 
+        ' InfosZumProgrammToolStripMenuItem
+        ' 
+        InfosZumProgrammToolStripMenuItem.Name = "InfosZumProgrammToolStripMenuItem"
+        InfosZumProgrammToolStripMenuItem.Size = New Size(208, 22)
+        InfosZumProgrammToolStripMenuItem.Text = "Infos zum Programm"
         ' 
         ' RechtlichesToolStripMenuItem
         ' 
@@ -208,12 +229,6 @@ Partial Class Form1
         SplitContainer1.Size = New Size(1077, 755)
         SplitContainer1.SplitterDistance = 489
         SplitContainer1.TabIndex = 7
-        ' 
-        ' SupportUndBugReportToolStripMenuItem
-        ' 
-        SupportUndBugReportToolStripMenuItem.Name = "SupportUndBugReportToolStripMenuItem"
-        SupportUndBugReportToolStripMenuItem.Size = New Size(202, 22)
-        SupportUndBugReportToolStripMenuItem.Text = "Support und Bug Report"
         ' 
         ' Form1
         ' 
@@ -264,5 +279,7 @@ Partial Class Form1
     Friend WithEvents GithubToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents JGNSchlaubereichToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SupportUndBugReportToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PDSExportUndStempelnToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents InfosZumProgrammToolStripMenuItem As ToolStripMenuItem
 
 End Class
